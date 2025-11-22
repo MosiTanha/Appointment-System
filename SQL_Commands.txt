@@ -1,0 +1,21 @@
+
+create table Users(
+UserId int IDENTITY(1,1) NOT NULL PRIMARY KEY,
+Username varchar(50) NOT NULL,
+Password varchar(512) NOT NULL,
+Email varchar(100) NOT NULL,
+);
+
+
+
+create table MTable(
+AppointmentId int IDENTITY(1,1) NOT NULL PRIMARY KEY,
+Username varchar(50) NOT NULL,
+title varchar(100) NOT NULL,
+date varchar(15) NOT NULL,
+time varchar(15) NOT NULL,
+discription varchar(255) NOT NULL,
+UserId int NOT NULL,
+CONSTRAINT FK_Apps_Users FOREIGN KEY (UserId)   
+	REFERENCES dbo.Users (UserId)
+

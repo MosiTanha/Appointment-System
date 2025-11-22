@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "body": "^5.1.0",
+    "cookie": "^0.5.0",
+    "cookie-parser": "^1.4.6",
+    "crypto": "^1.0.1",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "fileupload": "^1.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "mssql": "^9.0.1",
+    "multer": "^1.4.5-lts.1",
+    "parser": "^0.1.4",
+    "session": "^0.1.0"
+  }
+}

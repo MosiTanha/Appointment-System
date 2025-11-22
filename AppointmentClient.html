@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Appointment System</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+  <link href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css" rel="Stylesheet"
+        type="text/css" />
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <script language="javascript">
+        $(document).ready(function () {
+            $("#date").datepicker({
+                minDate: 0
+            });
+        });
+    </script>
+</head>
+
+
+
+
+
+<body>
+
+<div class="container mt-3">
+    <table class="table table-dark table-hover">
+    <thead>
+      <tr style="">
+        <th>Username</th>
+        <th>Title</th>
+        <th>Appointment Date</th>
+        <th>Appointment Time</th>
+        <th>Description</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="demo">
+      
+      
+    </tbody>
+  </table>
+
+<p id="warn" class="text-danger mt-5"></p><br>
+<p id="date_warn" class="text-danger"></p>
+<input type="text" class="form-control w=50 " style="width:600px;" name="date" id="date" placeholder="Date"> 
+<input type="Time" class="form-control w=50 mt-1" style="width:600px;" name="time" id="time" > 
+<input type="title" class="form-control w=50 mt-1" style="width:600px" placeholder="Title"
+  name="title" id="title" > 
+<input type="text" class="form-control w=50 mt-1" style="width:600px" placeholder="Enter your comment"
+  name="comment" id="comment" > 
+  <label class="mt-2">To find a specific appointment enter the interested date and press the search button</label><br>
+  <button type="button" class="btn btn-primary m-1" onclick="searchAppt()">Search</button><br>
+<label class="mt-2">Press the list button to view the appointment list</label><br>
+  <button type="button" class="btn btn-success mt-2" style="width:74px" onclick="loadlist()">List</button><br>
+<label class="mt-2">To add an appointment, enter the appointment information and press the add button</label><br>   
+<button type="button" class="btn btn-info mt-2" style="width:74px" id="add">Add</button>
+<div style="text-align: center;">
+    <p ><span style="font-size: 150%">©</span> Created By Mostafa Tanhaei</p>
+</div>
+ 
+ 
+</div>
+<script>
+
+function searchAppt() {
+  const xhttp = new XMLHttpRequest();
+  xhttp.onload = function(){
+  var obj=JSON.parse(this.responseText);
+    var s=obj.map(x=>'<tr style="font-size:16px"><td>'+x.Username+'</td><td>'+x.title+'</td><td>'+x.date+'</td><td>'+x.time+'</td><td>'+x.discription+'</td><td><i class="btn fa fa-trash-o" onclick = deleterow(this) style="font-size:24px; color:blue"></i></td></tr>');
+    document.getElementById("demo").innerHTML =s.join("");
+}
+  let input = document.getElementById("date").value;
+    let date = new Date(input);
+    let da = date.getDate();
+    let day = da.toString();
+    if (day.length==1) 
+        {day = "0"+day;}
+    let m = date.getMonth()+1;
+    let month = m.toString();
+    if (month.length==1) 
+        {month = "0"+month;}
+    let year = date.getFullYear();
+    let d = month+"/"+day+"/"+year;
+  xhttp.open("POST", "/search", true );
+  xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+  xhttp.send("d="+d.toString());
+}
+
+var string;
+function loadlist() {
+  const xhttp = new XMLHttpRequest();
+  xhttp.onload = function() {
+    var obj=JSON.parse(this.responseText);
+    var s=obj.map(x=>'<tr style="font-size:16px"><td>'+x.Username+'</td><td>'+x.title+'</td><td>'+x.date+'</td><td>'+x.time+'</td><td>'+x.discription+'</td><td><i class="btn fa fa-trash-o" onclick = deleterow(this) style="font-size:24px; color:blue"></i></td></tr>');
+    document.getElementById("demo").innerHTML =s.join("");
+  }
+  xhttp.open("GET", "/list");
+  xhttp.send();
+}
+
+  function deleterow(el) {
+  let vlu1 = $(el).closest('tr').children('td').eq(0).html();
+  let vlu2 = $(el).closest('tr').children('td').eq(2).html();
+  let vlu3 = $(el).closest('tr').children('td').eq(3).html();
+  $(el).closest('tr').remove();
+  let http = new XMLHttpRequest()
+  http.open('POST', "delete", true);
+  http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+  http.onload = function() {//Call a function when the state changes.
+          alert("Your appointment was deleted."); 
+  } 
+  let params = 'Username='+vlu1+'&date='+vlu2+'&time='+vlu3;
+  http.send(params);
+}
+
+
+
+$(document).ready(function(){
+  $("#add").click(function(){
+  let input = document.getElementById("date").value;
+  if (input.length!=10||input.charAt(2)!='/'||input.charAt(5)!='/'||
+      parseInt(input.substr(0,1))>12||parseInt(input.substr(3,4))>31||
+      parseInt(input.substr(6,9))<new Date().getFullYear()||
+      (parseInt(input.substr(6,9))==new Date().getFullYear()&&parseInt(input.substr(0,2))<new Date().getMonth()+1)||
+      (parseInt(input.substr(6,9))==new Date().getFullYear()&&parseInt(input.substr(0,2))==new Date().getMonth()+1&&
+      parseInt(input.substr(3,2))<new Date().getDate())||
+      document.getElementById("time").value==""||document.getElementById("title").value==""||document.getElementById("comment").value==""){
+    document.getElementById("date_warn").innerHTML="Invalid input";
+  } else {
+      document.getElementById("date_warn").innerHTML="";
+      let date = new Date(input);
+      let da = date.getDate();
+      let m = date.getMonth()+1;
+      let day = da.toString();
+      if (day.length==1){
+        day = "0"+day;
+      }
+      let month = m.toString();
+      if (month.length==1) {
+        month = "0"+month;
+      }
+      let year = date.getFullYear();
+      let d = month+"/"+day+"/"+year;
+      let time = document.getElementById("time").value;
+      let hours = time.toString().charAt(0)+time.toString().charAt(1);
+      let minutes = time.toString().charAt(3)+time.toString().charAt(4);
+      let h = parseInt(hours);
+      let amorpm = 'AM';
+      if (h >= 12) {
+         h = (h % 12)||12;
+         amorpm = 'PM'
+         hours = h<10 ? "0"+h : h;
+      }
+      time = hours+":"+minutes+" "+amorpm;
+      let title = document.getElementById("title").value;
+      let comment = document.getElementById("comment").value;
+      var http = new XMLHttpRequest();
+      let params = 'title='+title.toString()+'&date='+d+'&time='+time+'&discription='+comment;
+      http.open('POST', 'addition', true);
+
+      //Send the proper header information along with the request
+      http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+      http.onload = function() {//Call a function when the state changes.
+              var obj=JSON.parse(this.responseText);
+              if (obj=='') {
+                document.getElementById("warn").innerHTML="This appointment has already existed";
+              } else {
+                alert("Your appointment was added.");
+                document.getElementById("warn").innerHTML="";
+              var s=obj.map(x=>'<tr style="font-size:16px"><td>'+x.Username+'</td><td>'+x.title+'</td><td>'+x.date+'</td><td>'+x.time+'</td><td>'+x.discription+'</td><td><i class="btn fa fa-trash-o" onclick = deleterow(this) style="font-size:24px; color:blue"></i></td></tr>');
+              document.getElementById("demo").innerHTML =s.join(""); 
+
+              }
+              
+      }
+      http.send(params);
+  }
+
+})
+})
+
+
+</script>
+
+</body>
+</html>
